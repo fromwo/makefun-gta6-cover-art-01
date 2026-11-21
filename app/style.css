@@ -1,188 +1,154 @@
-/* Vice Panels — editor chrome. Dark glass over a sunset gradient; the
-   cover itself is drawn on canvas, so this file only styles the editor. */
+/* Vice Panels — editor chrome. Dark violet UI with a warm sunset accent;
+   the cover itself is drawn on canvas, so this file only styles the app
+   around it. */
+
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #f5eefc;
-  background: linear-gradient(160deg, #1c0b2e 0%, #3d1550 45%, #7b2f5e 100%);
-  min-height: 100vh;
+  background: #150a22;
+  color: #f4ecff;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .topbar {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.25rem 1rem;
-  padding: 1rem 1.5rem 0.5rem;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid #3a2b52;
+  background: linear-gradient(90deg, #2b0a3d, #4a1042 55%, #1d2b5e);
 }
 
-.brand {
-  font-family: "Arial Black", Arial, sans-serif;
-  font-size: 1.9rem;
-  letter-spacing: 0.04em;
-  background: linear-gradient(90deg, #ffe259, #ff7e2f 55%, #ff2fb3);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 2px 18px rgba(255, 94, 122, 0.35);
+.brand { font-size: 22px; font-weight: 900; letter-spacing: 0.04em; }
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-right: 6px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffb347, #ff5e62 55%, #7b2ff7);
+  color: #fff;
+  font-size: 15px;
+  vertical-align: -8px;
 }
 
-.tagline { margin: 0; color: #e8d5f2; font-size: 0.95rem; }
+.tagline { margin: 0; color: #d9c8f2; font-size: 14px; }
 
 .app {
   display: grid;
-  grid-template-columns: minmax(300px, 380px) 1fr;
-  gap: 1.25rem;
-  padding: 1rem 1.5rem 2rem;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-.controls h1 { margin: 0.25rem 0 0.25rem; font-size: 1.25rem; }
-.hint { margin: 0.25rem 0 0.75rem; color: #d9c6e8; font-size: 0.88rem; line-height: 1.45; }
-
-fieldset {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 12px;
-  padding: 0.9rem 1rem 1rem;
-  margin: 0 0 1rem;
-  background: rgba(20, 8, 36, 0.45);
-}
-
-legend { font-weight: 800; padding: 0 0.4rem; }
-
-.field-label {
-  display: block;
-  font-weight: 700;
-  font-size: 0.88rem;
-  margin: 0.7rem 0 0.3rem;
-}
-
-.field-label output { float: right; color: #ffd9a0; }
-
-input[type="text"], select {
-  width: 100%;
-  padding: 0.55rem 0.65rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 1rem;
-}
-
-input[type="text"]:focus, select:focus, button:focus { outline: 2px solid #ff7e2f; outline-offset: 2px; }
-select option { color: #111; }
-
-input[type="range"] { width: 100%; accent-color: #ff7e2f; }
-
-button {
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.45rem 0.7rem;
-  font-size: 0.9rem;
-}
-
-button:hover { background: rgba(255, 255, 255, 0.22); }
-button:disabled { opacity: 0.5; cursor: wait; }
-
-.segmented { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.segmented button.on {
-  background: linear-gradient(90deg, #ff7e2f, #ff2fb3);
-  border-color: transparent;
-  font-weight: 800;
-}
-
-.slot {
-  display: flex;
-  gap: 0.7rem;
-  align-items: center;
-  padding: 0.55rem 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.slot:first-of-type { border-top: 0; }
-
-.thumb {
-  width: 64px;
-  height: 64px;
-  flex: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 1.3rem;
-  overflow: hidden;
-}
-
-.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.slot-body { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
-.slot-name { font-weight: 800; width: 100%; }
-
-.file-btn {
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 0.45rem 0.7rem;
-  font-size: 0.9rem;
-}
-
-.file-btn input[type="file"] { display: none; }
-
-.export-btn {
-  width: 100%;
-  margin-top: 0.7rem;
-  padding: 0.8rem;
-  font-size: 1.05rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, #ff7e2f, #ff2fb3);
-  border: none;
-}
-
-#status { margin: 0.7rem 0 0; color: #ffd9a0; font-size: 0.9rem; min-height: 1.2em; }
-
-.stage { position: sticky; top: 1rem; }
-.stage .hint { text-align: center; }
+.preview-col { min-width: 0; }
 
 #preview {
   display: block;
   width: 100%;
-  max-width: 720px;
   height: auto;
-  margin: 0 auto;
-  border-radius: 6px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
-  cursor: grab;
+  border-radius: 10px;
+  background: #120a1e;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
   touch-action: none;
-  background: #fff;
+  cursor: grab;
 }
 
 #preview:active { cursor: grabbing; }
 
-/* Deterministic shots: the cover fills the viewport, controls hidden. */
-body.shot-cover .topbar,
-body.shot-cover .controls,
-body.shot-cover .stage .hint { display: none; }
+#status { min-height: 1.5em; margin: 10px 2px 0; color: #ffb347; font-weight: 600; }
+.hint { margin: 0 2px; color: #b9a8d6; font-size: 14px; }
 
-body.shot-cover .app { display: block; padding: 0; }
-body.shot-cover .stage { position: static; }
-body.shot-cover #preview {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  object-fit: contain;
-  border-radius: 0;
-  box-shadow: none;
+.controls { display: flex; flex-direction: column; gap: 14px; }
+
+.group {
+  padding: 14px;
+  border: 1px solid #3a2b52;
+  border-radius: 12px;
+  background: #1e1229;
 }
 
-@media (max-width: 900px) {
+.group h2 { margin: 0 0 8px; font-size: 15px; letter-spacing: 0.03em; }
+.group p { margin: 0 0 10px; color: #cbb8e6; font-size: 14px; }
+.or { margin: 10px 0 6px; }
+
+.slots, .pickrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.slots { margin-bottom: 4px; }
+
+button {
+  appearance: none;
+  border: 1px solid #5b4480;
+  border-radius: 8px;
+  background: #2a1a3d;
+  color: #f4ecff;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:hover { border-color: #ffb347; }
+button.on { border-color: #ffb347; background: #4a2a12; color: #ffd9a0; }
+button.primary {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  background: linear-gradient(90deg, #ff9a3c, #ff5e62 55%, #7b2ff7);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.panel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+label { display: block; margin: 10px 0 4px; font-size: 14px; }
+label output { float: right; color: #ffb347; font-weight: 700; }
+
+input[type="range"] { width: 100%; accent-color: #ff5e62; }
+
+input[type="text"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 10px;
+  border: 1px solid #5b4480;
+  border-radius: 8px;
+  background: #150a22;
+  color: #f4ecff;
+  font: inherit;
+}
+
+.fineprint { color: #9a86bd; font-size: 12px; }
+
+/* Deterministic screenshot mode: the cover fills the viewport, the editor
+   chrome disappears, so a headless shot is exactly the exported art. */
+body[data-shot="cover"] { background: #120a1e; }
+body[data-shot="cover"] .topbar,
+body[data-shot="cover"] .controls,
+body[data-shot="cover"] #status,
+body[data-shot="cover"] .hint { display: none; }
+body[data-shot="cover"] .app { display: block; max-width: none; margin: 0; padding: 0; }
+body[data-shot="cover"] .preview-col { width: 100vw; height: 100vh; }
+body[data-shot="cover"] #preview {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: fill;
+}
+
+@media (max-width: 860px) {
   .app { grid-template-columns: 1fr; }
-  .stage { position: static; }
 }

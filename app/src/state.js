@@ -1,123 +1,90 @@
-// Vice Panels — shared state: layouts, colour grades and export sizes.
-// Everything the renderer and the editor agree on lives here, so a shot
-// URL, the editor and the exporter all describe the same cover.
-
-export const SLOT_IDS = ['A', 'B', 'C'];
+// Vice Panels — shared editor state: layouts, export sizes and defaults.
+// Nothing here touches the DOM; render.js draws from this state, editor.js
+// mutates it. A panel is one rectangle of the cover: it holds a photo slot,
+// a zoom factor and a pan offset (fractions of the panel size).
 
 export const LAYOUTS = {
-  hero: {
-    label: 'Hero',
-    hint: 'One big panel over a two-panel strip',
-    panels: ['A', 'B', 'C'],
-  },
-  four: {
-    label: 'Four panels',
-    hint: 'A 2 x 2 grid of equal panels',
-    panels: ['A', 'B', 'C', 'A'],
-  },
-  split: {
-    label: 'Split duo',
-    hint: 'Two panels, side by side or stacked',
-    panels: ['A', 'B'],
-  },
+  hero: { label: 'Hero', panels: 3 },
+  four: { label: 'Four panels', panels: 4 },
+  split: { label: 'Split duo', panels: 2 },
 };
 
-export const GRADES = {
-  sunset: {
-    label: 'Sunset',
-    hint: 'Warm orange-pink Vice City dusk',
-    sky: ['#ff9a3d', '#ff5e7a', '#7b2f8e'],
-    tint: '#ff7a2f',
-    tintStrength: 0.22,
-    title: ['#ffe259', '#ff7e2f'],
-    titleStroke: '#2b0a3d',
-  },
-  neon: {
-    label: 'Neon',
-    hint: 'Hot pink and cyan night lights',
-    sky: ['#ff2fb3', '#7a2bff', '#00e5ff'],
-    tint: '#ff2fb3',
-    tintStrength: 0.2,
-    title: ['#7df9ff', '#ff2fb3'],
-    titleStroke: '#12002b',
-  },
-  dusk: {
-    label: 'Dusk',
-    hint: 'Deep purple evening, low and moody',
-    sky: ['#3b2d7a', '#8e2f6e', '#ff8a5c'],
-    tint: '#5b3df0',
-    tintStrength: 0.18,
-    title: ['#ffd9a0', '#ff5e7a'],
-    titleStroke: '#160b2e',
-  },
-};
+export const GRADES = ['sunset', 'neon', 'dusk'];
 
 export const EXPORT_SIZES = [
-  { id: 'square', label: '1080 x 1080', w: 1080, h: 1080 },
-  { id: 'portrait', label: '1080 x 1350', w: 1080, h: 1350 },
-  { id: 'wide', label: '1920 x 1080', w: 1920, h: 1080 },
+  { id: '1080x1080', label: 'Square 1080 x 1080', w: 1080, h: 1080 },
+  { id: '1080x1350', label: 'Portrait 1080 x 1350', w: 1080, h: 1350 },
+  { id: '1920x1080', label: 'Wide 1920 x 1080', w: 1920, h: 1080 },
 ];
+
+export const PHOTO_SLOTS = ['A', 'B', 'C'];
+
+// One panel's crop: slot is 'A' | 'B' | 'C' | 'pier' | 'boulevard' | null,
+// zoom multiplies the cover-fit scale, ox/oy shift the photo in panel units.
+export function freshPanel(slot) {
+  return { slot, zoom: 1, ox: 0, oy: 0 };
+}
 
 export function defaultState() {
   return {
     layout: 'hero',
+    splitDirection: 'vertical', // 'vertical' (side by side) | 'horizontal' (stacked)
     grade: 'sunset',
     title: 'Sunset Heist',
-    subtitle: 'VICE CITY \u2022 2026',
-    sizeId: 'square',
-    // Per-panel crop: zoom >= 1, dx/dy are fractions of the panel size.
-    crops: {
-      0: { zoom: 1.05, dx: 0, dy: 0 },
-      1: { zoom: 1.1, dx: 0, dy: 0 },
-      2: { zoom: 1.1, dx: 0, dy: 0 },
-      3: { zoom: 1.05, dx: 0, dy: 0 },
-    },
-    // Which photo slot fills each panel slot (index into LAYOUTS panels).
-    panelSlots: { 0: 'A', 1: 'B', 2: 'C', 3: 'A' },
+    subtitle: 'VICE CITY • A STORY IN THREE PANELS',
+    exportSize: '1080x1080',
     selectedPanel: 0,
+    panels: [freshPanel('pier'), freshPanel('boulevard'), freshPanel('pier')],
   };
 }
 
-// Panel rectangles for a layout, in fractions of the cover (x, y, w, h).
-// gap is the gutter between panels, also as a fraction of the cover width.
-export function panelRects(layout, coverW, coverH) {
-  const gap = Math.round(Math.min(coverW, coverH) * 0.012);
-  const wide = coverW >= coverH;
-  if (layout === 'four') {
-    const halfW = (coverW - gap) / 2;
-    const halfH = (coverH - gap) / 2;
+// Panel rectangles for a layout, as fractions of the cover (x, y, w, h).
+// gap is the fraction of the cover width left white between panels.
+export function panelRects(state, gap = 0.012) {
+  const g = gap;
+  if (state.layout === 'four') {
+    const half = 0.5 - g / 2;
     return [
-      { x: 0, y: 0, w: halfW, h: halfH },
-      { x: halfW + gap, y: 0, w: halfW, h: halfH },
-      { x: 0, y: halfH + gap, w: halfW, h: halfH },
-      { x: halfW + gap, y: halfH + gap, w: halfW, h: halfH },
+      { x: 0, y: 0, w: half, h: half },
+      { x: 0.5 + g / 2, y: 0, w: half, h: half },
+      { x: 0, y: 0.5 + g / 2, w: half, h: half },
+      { x: 0.5 + g / 2, y: 0.5 + g / 2, w: half, h: half },
     ];
   }
-  if (layout === 'split') {
-    if (wide) {
-      const halfW = (coverW - gap) / 2;
+  if (state.layout === 'split') {
+    if (state.splitDirection === 'horizontal') {
+      const half = 0.5 - g / 2;
       return [
-        { x: 0, y: 0, w: halfW, h: coverH },
-        { x: halfW + gap, y: 0, w: halfW, h: coverH },
+        { x: 0, y: 0, w: 1, h: half },
+        { x: 0, y: 0.5 + g / 2, w: 1, h: half },
       ];
     }
-    const halfH = (coverH - gap) / 2;
+    const half = 0.5 - g / 2;
     return [
-      { x: 0, y: 0, w: coverW, h: halfH },
-      { x: 0, y: halfH + gap, w: coverW, h: halfH },
+      { x: 0, y: 0, w: half, h: 1 },
+      { x: 0.5 + g / 2, y: 0, w: half, h: 1 },
     ];
   }
-  // hero: big panel on top, two small ones in the strip below.
-  const bigH = Math.round(coverH * 0.68);
-  const stripH = coverH - bigH - gap;
-  const halfW = (coverW - gap) / 2;
+  // hero: one big panel on the left, two stacked strips on the right.
+  const main = 0.64 - g / 2;
+  const strip = 1 - main - g;
+  const half = 0.5 - g / 2;
   return [
-    { x: 0, y: 0, w: coverW, h: bigH },
-    { x: 0, y: bigH + gap, w: halfW, h: stripH },
-    { x: halfW + gap, y: bigH + gap, w: halfW, h: stripH },
+    { x: 0, y: 0, w: main, h: 1 },
+    { x: main + g, y: 0, w: strip, h: half },
+    { x: main + g, y: 0.5 + g / 2, w: strip, h: half },
   ];
 }
 
-export function exportSizeById(id) {
-  return EXPORT_SIZES.find((s) => s.id === id) ?? EXPORT_SIZES[0];
+// Keep the panel list the right length when the layout changes, reusing the
+// photos the user already placed instead of wiping them.
+export function fitPanelsToLayout(state) {
+  const want = LAYOUTS[state.layout].panels;
+  const keep = state.panels.slice(0, want);
+  while (keep.length < want) {
+    const donor = state.panels[keep.length % Math.max(state.panels.length, 1)] || freshPanel('pier');
+    keep.push(freshPanel(donor.slot));
+  }
+  state.panels = keep;
+  state.selectedPanel = Math.min(state.selectedPanel, want - 1);
 }

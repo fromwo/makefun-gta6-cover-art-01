@@ -3,92 +3,103 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Panels — GTA-style cover maker</title>
-<link rel="icon" href="data:,">
+<title>Vice Panels — GTA-style cover art maker</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand">VICE PANELS</div>
-  <p class="tagline">Turn your photos into a multi-panel Vice City cover. Your photos never leave this machine.</p>
+  <div class="brand"><span class="brand-mark">VP</span> Vice Panels</div>
+  <p class="tagline">Your photos, turned into a multi-panel Vice City style cover — offline, in your browser.</p>
 </header>
 <main class="app">
-  <section class="controls" aria-label="Cover controls">
-    <h1>Make your cover</h1>
-    <p class="hint">Three steps: load photos, pick a layout and grade, export a PNG.</p>
-
-    <fieldset>
-      <legend>1 &middot; Your photos</legend>
-      <p class="hint">Up to three photos, slots A, B and C. Or try a sample photo first.</p>
-      <div class="slot" id="slot-a">
-        <div class="thumb" id="thumb-a">A</div>
-        <div class="slot-body">
-          <span class="slot-name">Slot A</span>
-          <label class="file-btn">Choose photo <input id="file-a" type="file" accept="image/*"></label>
-          <button id="sample-a" type="button">Use sample</button>
-          <button id="clear-a" type="button">Clear</button>
-        </div>
-      </div>
-      <div class="slot" id="slot-b">
-        <div class="thumb" id="thumb-b">B</div>
-        <div class="slot-body">
-          <span class="slot-name">Slot B</span>
-          <label class="file-btn">Choose photo <input id="file-b" type="file" accept="image/*"></label>
-          <button id="sample-b" type="button">Use sample</button>
-          <button id="clear-b" type="button">Clear</button>
-        </div>
-      </div>
-      <div class="slot" id="slot-c">
-        <div class="thumb" id="thumb-c">C</div>
-        <div class="slot-body">
-          <span class="slot-name">Slot C</span>
-          <label class="file-btn">Choose photo <input id="file-c" type="file" accept="image/*"></label>
-          <button id="sample-c" type="button">Use sample</button>
-          <button id="clear-c" type="button">Clear</button>
-        </div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>2 &middot; Layout &amp; grade</legend>
-      <label class="field-label">Layout</label>
-      <div class="segmented" id="layout-pick" role="group" aria-label="Layout"></div>
-      <label class="field-label">Colour grade</label>
-      <div class="segmented" id="grade-pick" role="group" aria-label="Colour grade"></div>
-      <label class="field-label" for="title">Title</label>
-      <input id="title" type="text" maxlength="40" value="Sunset Heist">
-      <label class="field-label" for="subtitle">Subtitle</label>
-      <input id="subtitle" type="text" maxlength="48" value="VICE CITY &bull; 2026">
-    </fieldset>
-
-    <fieldset>
-      <legend>3 &middot; Crop each panel</legend>
-      <p class="hint">Pick a panel, then drag its photo on the preview or use the sliders.</p>
-      <div class="segmented" id="panel-pick" role="group" aria-label="Panel"></div>
-      <label class="field-label" for="panel-slot">Photo in this panel</label>
-      <select id="panel-slot"></select>
-      <label class="field-label" for="zoom">Zoom <output id="zoom-val">105%</output></label>
-      <input id="zoom" type="range" min="1" max="2.5" step="0.01" value="1.05">
-      <label class="field-label" for="move-x">Move left / right <output id="move-x-val">0</output></label>
-      <input id="move-x" type="range" min="-0.6" max="0.6" step="0.01" value="0">
-      <label class="field-label" for="move-y">Move up / down <output id="move-y-val">0</output></label>
-      <input id="move-y" type="range" min="-0.6" max="0.6" step="0.01" value="0">
-      <button id="reset-crop" type="button">Reset this panel&rsquo;s crop</button>
-    </fieldset>
-
-    <fieldset>
-      <legend>4 &middot; Export</legend>
-      <label class="field-label">PNG size</label>
-      <div class="segmented" id="size-pick" role="group" aria-label="Export size"></div>
-      <button id="export" type="button" class="export-btn">Export PNG</button>
-      <p id="status" role="status"></p>
-    </fieldset>
+  <section class="preview-col">
+    <canvas id="preview" width="760" height="560" aria-label="Cover preview — drag a photo to reposition it"></canvas>
+    <p id="status" role="status"></p>
+    <p class="hint">Drag a photo on the preview to pan it. Click a panel to select it, then fine-tune it below.</p>
   </section>
+  <aside class="controls">
+    <section class="group" aria-label="Photos">
+      <h2>1 · Photos</h2>
+      <p>Load up to three of your own photos. Files never leave your machine.</p>
+      <div class="slots">
+        <button id="pick-a" type="button">Slot A — choose photo</button>
+        <button id="pick-b" type="button">Slot B — choose photo</button>
+        <button id="pick-c" type="button">Slot C — choose photo</button>
+      </div>
+      <input id="file-a" type="file" accept="image/*" hidden>
+      <input id="file-b" type="file" accept="image/*" hidden>
+      <input id="file-c" type="file" accept="image/*" hidden>
+      <p class="or">Or try a sample photo:</p>
+      <div class="slots">
+        <button id="sample-pier" type="button">Pier sample</button>
+        <button id="sample-boulevard" type="button">Boulevard sample</button>
+      </div>
+    </section>
 
-  <section class="stage" aria-label="Cover preview">
-    <canvas id="preview" width="1080" height="1080" aria-label="Cover preview"></canvas>
-    <p class="hint">Drag a panel&rsquo;s photo to move it. The title sits over the bottom of the cover.</p>
-  </section>
+    <section class="group" aria-label="Layout and grade">
+      <h2>2 · Layout &amp; grade</h2>
+      <div class="pickrow" role="group" aria-label="Layout">
+        <button type="button" data-layout="hero">Hero</button>
+        <button type="button" data-layout="four">Four panels</button>
+        <button type="button" data-layout="split">Split duo</button>
+      </div>
+      <div class="pickrow" id="split-row" hidden>
+        <button id="split-dir" type="button">Side by side</button>
+      </div>
+      <div class="pickrow" role="group" aria-label="Colour grade">
+        <button type="button" data-grade="sunset">Sunset</button>
+        <button type="button" data-grade="neon">Neon</button>
+        <button type="button" data-grade="dusk">Dusk</button>
+      </div>
+    </section>
+
+    <section class="group" aria-label="Panel crop">
+      <h2>3 · Crop the panel</h2>
+      <div class="panel-nav">
+        <button id="prev-panel" type="button" aria-label="Previous panel">←</button>
+        <span id="panel-label">Panel 1 of 3</span>
+        <button id="next-panel" type="button" aria-label="Next panel">→</button>
+      </div>
+      <div class="pickrow" role="group" aria-label="Photo for this panel">
+        <button type="button" data-slot="A">A</button>
+        <button type="button" data-slot="B">B</button>
+        <button type="button" data-slot="C">C</button>
+        <button type="button" data-slot="pier">Pier</button>
+        <button type="button" data-slot="boulevard">Blvd</button>
+      </div>
+      <label>Zoom <output id="zoom-out">100%</output>
+        <input id="zoom" type="range" min="1" max="2.5" step="0.01" value="1">
+      </label>
+      <label>Move left / right <output id="pan-x-out">0</output>
+        <input id="pan-x" type="range" min="-1" max="1" step="0.01" value="0">
+      </label>
+      <label>Move up / down <output id="pan-y-out">0</output>
+        <input id="pan-y" type="range" min="-1" max="1" step="0.01" value="0">
+      </label>
+      <button id="reset-crop" type="button">Reset this panel's crop</button>
+    </section>
+
+    <section class="group" aria-label="Caption">
+      <h2>4 · Caption</h2>
+      <label>Title
+        <input id="title" type="text" maxlength="40" value="Sunset Heist">
+      </label>
+      <label>Subtitle
+        <input id="subtitle" type="text" maxlength="60" value="VICE CITY • A STORY IN THREE PANELS">
+      </label>
+    </section>
+
+    <section class="group" aria-label="Export">
+      <h2>5 · Export PNG</h2>
+      <div class="pickrow" role="group" aria-label="Export size">
+        <button type="button" data-size="1080x1080">1080²</button>
+        <button type="button" data-size="1080x1350">1080×1350</button>
+        <button type="button" data-size="1920x1080">1920×1080</button>
+      </div>
+      <button id="export" type="button" class="primary">Export PNG</button>
+      <p class="fineprint">Original art only — no Rockstar logo, artwork or fonts. Photos stay on your machine.</p>
+    </section>
+  </aside>
 </main>
 <script type="module" src="./src/main.js"></script>
 </body>
