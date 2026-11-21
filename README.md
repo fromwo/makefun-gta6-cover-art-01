@@ -1,58 +1,55 @@
-# Vice Panels — GTA 6-style cover maker
-
 [![make.fun](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01)
 [![rank](https://make.fun/badge/gta6-cover-art-01/fromwo/makefun-gta6-cover-art-01/rank.svg)](https://make.fun/bounty/gta6-cover-art-01)
 [![reward](https://make.fun/badge/gta6-cover-art-01/fromwo/makefun-gta6-cover-art-01/reward.svg)](https://make.fun/bounty/gta6-cover-art-01)
 
-Vice Panels turns your own photos into a multi-panel poster in the style of
-GTA 6 cover art: a big hero photo with a strip of smaller panels, a four-panel
-comic grid, or a tall split duo, all washed in a Vice City sunset, neon or
-dusk colour grade, with a bold gradient title and a letterspaced subtitle
-across the foot. Photos are read on your machine and never uploaded, and the
-finished cover exports as a PNG in the sizes people actually post —
-1080 × 1080, 1080 × 1350 or 1920 × 1080.
+# Vice Panels — GTA-style cover maker
 
-## How it works
+Turn your own photos into a multi-panel Vice City cover, in the browser, offline, for free.
 
-1. **Load photos** — pick up to three of your own photos (slots A, B, C), or
-   try the two kit sample photos to see it working at once.
-2. **Pick a layout and a grade** — Hero + strip, Four panels, or Split duo;
-   Sunset, Neon, or Dusk. Click any panel in the live preview to select it.
-3. **Crop each panel** — drag the photo inside its panel, or use the zoom
-   and move sliders; swap which photo a panel shows, or reset it.
-4. **Write the caption** — edit the title and subtitle; the lettering is
-   drawn with system fonts plus canvas gradient, outline and shadow effects.
-5. **Export PNG** — one click saves the cover at the chosen size.
+## What it is
 
-Everything runs offline from static files: open `app/index.html` in desktop
-Chrome and it works with no network request. The design is original — no
-Rockstar logo, wordmark, official artwork, character or font file is used.
+**Vice Panels** is a static web app (plain files under `app/`, no build step, no network requests, no Rockstar logo, artwork or font — all lettering and art are original). It turns up to three of your photos and a caption into cover art in the style of GTA 6 posters:
 
-## Run it
+- **Your photos** — load up to 3 photos from your machine into slots A / B / C (or try the two kit sample photos with one click). Photos are read locally and never uploaded.
+- **Three layouts** — Hero (one big panel over a two-panel strip), Four panels (2 x 2 grid), Split duo (two panels, side by side or stacked).
+- **Three colour grades** — Sunset, Neon and Dusk, each with its own sky gradient, tint and title gradient.
+- **Crop each panel** — pick a panel, drag its photo on the preview, or use the zoom / move sliders; choose which photo slot fills each panel; reset any panel's crop.
+- **Bold lettering** — editable title and subtitle, drawn as heavy gradient type with a dark outline and drop shadow.
+- **Export PNG** — one click, in 1080 x 1080, 1080 x 1350 or 1920 x 1080.
+
+## How to use it
+
+1. Open the app (see below).
+2. Load a photo into slot A (B and C are optional).
+3. Pick a layout and a grade, edit the title and subtitle.
+4. Click a panel, drag its photo to frame it, adjust zoom if needed.
+5. Pick an export size and hit **Export PNG**.
+
+Deterministic screenshots: the app honours `?shot=` URLs, e.g. `?shot=cover&photo=pier&caption=Sunset%20Heist` renders a full-bleed cover, and `?shot=editor&photo=boulevard&caption=Boulevard%20Queen` opens the editor with a photo loaded. `&layout=`, `&grade=` and `&size=` are optional extras. The definitions live in `shots.json`.
+
+## How to run it
 
 ```sh
 node serve.ts
 ```
 
-Then open http://localhost:8080 in desktop Chrome.
+Then open <http://localhost:8080> in desktop Chrome. No build step, no install, no network.
 
-To build the submission output (copies `app/` and `screenshots/` and writes
-`dossier.json`):
+## How to make the submission output
 
 ```sh
-MAKEFUN_OUTPUT_DIR=out node main.ts
+mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
+
+That copies `app/` and `screenshots/` into `out/` and writes `out/dossier.json` (via `vendor/makefun-app.ts`). In the grader the output directory is `/output`.
 
 ## Files
 
-- `app/index.html` — the editor page
-- `app/style.css` — the dark neon editor styling
-- `app/src/main.js` — wiring: uploads, controls, drag-to-pan, export
-- `app/src/render.js` — draws the cover: panels, colour grade, caption band
-- `app/src/panels.js` — the three poster layouts and their geometry
-- `app/src/shots.js` — fixed `?shot=` scenes used for the screenshots
-- `app/samples/` — kit-provided sample photos, free to use
-- `main.ts` — the entry program (Node 22, standard library only)
-- `screenshots/` — the exported covers and the editor at work
-
-Built for the [make.fun GTA 6 cover art bounty](https://make.fun/bounty/gta6-cover-art-01).
+- `app/index.html`, `app/style.css` — the editor page and its styling.
+- `app/src/state.js` — layouts, grades, export sizes, panel geometry.
+- `app/src/render.js` — the canvas cover renderer (panels, grades, lettering).
+- `app/src/shots.js` — deterministic `?shot=` URLs for screenshots.
+- `app/src/main.js` — the editor wiring: photo slots, crop controls, export.
+- `app/samples/` — the kit's two free sample photos (`boulevard.jpg`, `pier.jpg`).
+- `main.ts` — submission entrypoint; `serve.ts` — local static server; `shots.json` — shot definitions.
+- `screenshots/` — 3–4 screenshots taken from the running app (first by name is the cover).

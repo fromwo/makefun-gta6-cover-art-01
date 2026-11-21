@@ -1,65 +1,188 @@
+/* Vice Panels — editor chrome. Dark glass over a sunset gradient; the
+   cover itself is drawn on canvas, so this file only styles the editor. */
 * { box-sizing: border-box; }
-html, body { margin: 0; min-height: 100%; }
+
 body {
-  background: #12081d;
-  background-image: linear-gradient(160deg, #2b0f3d 0%, #12081d 55%, #0b1026 100%);
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
   color: #f5eefc;
-  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: linear-gradient(160deg, #1c0b2e 0%, #3d1550 45%, #7b2f5e 100%);
+  min-height: 100vh;
 }
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  padding: 1rem 1.5rem 0.5rem;
+}
+
+.brand {
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 1.9rem;
+  letter-spacing: 0.04em;
+  background: linear-gradient(90deg, #ffe259, #ff7e2f 55%, #ff2fb3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 18px rgba(255, 94, 122, 0.35);
+}
+
+.tagline { margin: 0; color: #e8d5f2; font-size: 0.95rem; }
+
 .app {
-  display: flex; gap: 22px; align-items: flex-start; justify-content: center;
-  padding: 20px; max-width: 1280px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(300px, 380px) 1fr;
+  gap: 1.25rem;
+  padding: 1rem 1.5rem 2rem;
+  align-items: start;
 }
-.controls { width: 340px; flex: none; display: flex; flex-direction: column; gap: 12px; }
-.controls h1 {
-  margin: 0; font-size: 30px; letter-spacing: 1px; text-transform: uppercase;
-  background: linear-gradient(90deg, #ffe259, #ff7a18 45%, #ff2d78);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-.tagline { margin: 0; color: #cbb8dd; }
+
+.controls h1 { margin: 0.25rem 0 0.25rem; font-size: 1.25rem; }
+.hint { margin: 0.25rem 0 0.75rem; color: #d9c6e8; font-size: 0.88rem; line-height: 1.45; }
+
 fieldset {
-  border: 1px solid #4a2b63; border-radius: 12px; padding: 11px;
-  display: flex; flex-direction: column; gap: 10px; margin: 0;
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  padding: 0.9rem 1rem 1rem;
+  margin: 0 0 1rem;
+  background: rgba(20, 8, 36, 0.45);
 }
-legend { font-weight: 800; letter-spacing: 0.4px; padding: 0 6px; color: #ffd166; }
-.hint { margin: 0; color: #b9a3cc; font-size: 13px; }
-label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
-.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.slot { font-size: 13px; }
-input[type="file"] { font: inherit; font-size: 12px; color: #d9c8ea; max-width: 100%; }
+
+legend { font-weight: 800; padding: 0 0.4rem; }
+
+.field-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  margin: 0.7rem 0 0.3rem;
+}
+
+.field-label output { float: right; color: #ffd9a0; }
+
 input[type="text"], select {
-  font: inherit; padding: 9px 10px; border: 1px solid #5b3a75; border-radius: 8px;
-  background: #1d1030; color: #fff;
+  width: 100%;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
 }
-input[type="range"] { width: 100%; accent-color: #ff2d78; }
-.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+input[type="text"]:focus, select:focus, button:focus { outline: 2px solid #ff7e2f; outline-offset: 2px; }
+select option { color: #111; }
+
+input[type="range"] { width: 100%; accent-color: #ff7e2f; }
+
 button {
-  font: inherit; font-weight: 700; padding: 9px 12px; border: 1px solid #6b468c;
-  border-radius: 8px; background: #2a1740; color: #f5eefc; cursor: pointer;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.9rem;
 }
-button:hover { background: #3a2158; }
-button.active { background: #ff2d78; border-color: #ff2d78; color: #fff; }
-button.big {
-  padding: 13px; font-size: 17px;
-  background: linear-gradient(90deg, #ff7a18, #ff2d78);
-  border: 0; color: #fff;
+
+button:hover { background: rgba(255, 255, 255, 0.22); }
+button:disabled { opacity: 0.5; cursor: wait; }
+
+.segmented { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.segmented button.on {
+  background: linear-gradient(90deg, #ff7e2f, #ff2fb3);
+  border-color: transparent;
+  font-weight: 800;
 }
-button.big:hover { filter: brightness(1.12); }
-#status { margin: 0; min-height: 1.2em; color: #8dff9e; }
-.fine { margin: 0; font-size: 12px; color: #8d7a9e; }
-.stage { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
-.stage canvas {
-  width: min(72vh, 100%); height: auto; aspect-ratio: auto;
-  border-radius: 6px; box-shadow: 0 14px 44px rgba(0, 0, 0, 0.55);
-  touch-action: none; cursor: grab; background: #1a0b26;
+
+.slot {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.55rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
-.stage canvas:active { cursor: grabbing; }
-body.shot-cover .controls, body.shot-cover .stage .hint { display: none; }
-body.shot-cover .app { padding: 0; max-width: none; }
-body.shot-cover .stage { width: 100%; }
-body.shot-cover .stage canvas { width: 100vw; height: 100vh; object-fit: contain; border-radius: 0; box-shadow: none; }
-@media (max-width: 860px) {
-  .app { flex-direction: column; }
-  .controls { width: 100%; }
+
+.slot:first-of-type { border-top: 0; }
+
+.thumb {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.3rem;
+  overflow: hidden;
+}
+
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.slot-body { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.slot-name { font-weight: 800; width: 100%; }
+
+.file-btn {
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.file-btn input[type="file"] { display: none; }
+
+.export-btn {
+  width: 100%;
+  margin-top: 0.7rem;
+  padding: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #ff7e2f, #ff2fb3);
+  border: none;
+}
+
+#status { margin: 0.7rem 0 0; color: #ffd9a0; font-size: 0.9rem; min-height: 1.2em; }
+
+.stage { position: sticky; top: 1rem; }
+.stage .hint { text-align: center; }
+
+#preview {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 6px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  cursor: grab;
+  touch-action: none;
+  background: #fff;
+}
+
+#preview:active { cursor: grabbing; }
+
+/* Deterministic shots: the cover fills the viewport, controls hidden. */
+body.shot-cover .topbar,
+body.shot-cover .controls,
+body.shot-cover .stage .hint { display: none; }
+
+body.shot-cover .app { display: block; padding: 0; }
+body.shot-cover .stage { position: static; }
+body.shot-cover #preview {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .stage { position: static; }
 }

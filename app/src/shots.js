@@ -1,24 +1,54 @@
-// Fixed scenes for screenshots: ?shot=editor shows the editor with sample
-// photos loaded; ?shot=cover shows the finished cover alone (controls
-// hidden). Query knobs: photo / photo2 / photo3 (sample names), title,
-// subtitle, layout, grade, size (1080x1080, 1080x1350 or 1920x1080).
-// window.__shotReady is set once the scene has painted.
+// Vice Panels — deterministic shots. A ?shot= URL sets the whole cover up
+// from the query string so a headless browser can reproduce a screenshot:
+//   ?shot=cover&photo=pier&caption=Sunset%20Heist
+//   ?shot=editor&photo=boulevard&caption=Boulevard%20Queen
+// Optional extras: &layout=hero|four|split &grade=sunset|neon|dusk
+// &size=square|portrait|wide. The page marks itself ready (data-ready)
+// once the sample photo has loaded and the first cover is drawn.
 
-export async function runShot(shot, query, apply) {
-  const size = query.get('size') ?? '1080x1080';
-  const scene = {
-    layout: query.get('layout') ?? 'hero',
-    grade: query.get('grade') ?? 'sunset',
-    title: query.get('title') ?? 'Boulevard Queen',
-    subtitle: query.get('subtitle') ?? 'one last score',
-    size,
-    photos: [
-      `samples/${query.get('photo') ?? 'boulevard'}.jpg`,
-      `samples/${query.get('photo2') ?? 'pier'}.jpg`,
-      `samples/${query.get('photo3') ?? 'boulevard'}.jpg`,
-    ],
+import { GRADES, LAYOUTS, exportSizeById } from './state.js';
+
+const SAMPLES = {
+  pier: './samples/pier.jpg',
+  boulevard: './samples/boulevard.jpg',
+};
+
+export function shotParams() {
+  const q = new URLSearchParams(window.location.search);
+  const shot = q.get('shot');
+  if (!shot) return null;
+  return {
+    shot,
+    photo: q.get('photo') || 'pier',
+    caption: q.get('caption') || '',
+    layout: q.get('layout') || '',
+    grade: q.get('grade') || '',
+    size: q.get('size') || '',
   };
-  if (shot === 'cover') document.body.classList.add('shot-cover');
-  await apply(scene);
-  requestAnimationFrame(() => requestAnimationFrame(() => { window.__shotReady = true; }));
+}
+
+export function applyShot(state, params) {
+  if (params.caption) state.title = params.caption;
+  if (params.layout && LAYOUTS[params.layout]) state.layout = params.layout;
+  if (params.grade && GRADES[params.grade]) state.grade = params.grade;
+  if (params.size) state.sizeId = exportSizeById(params.size).id;
+  return params;
+}
+
+// Load the shot's sample photo into slot A and resolve with the image
+// (or null when the photo name is unknown). Used by main.js at startup.
+export function loadShotPhoto(params) {
+  return new Promise((resolve) => {
+    const src = SAMPLES[params.photo];
+    if (!src) { resolve(null); return; }
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
+
+export function markReady() {
+  document.documentElement.dataset.ready = 'true';
+  document.title = `${document.title} \u2022 ready`;
 }

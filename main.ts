@@ -1,47 +1,40 @@
-// Vice Panels entry point (Node 22, standard library only).
+// Vice Panels — submission entrypoint (Node 22, standard library only).
+// Copies the finished app (app/) and its screenshots (screenshots/) into
+// the output directory and writes dossier.json with the vendored make.fun
+// library, so the sealed scorer can check the entry byte for byte.
 //
-// The app itself is plain static files under app/ — index.html plus its ES
-// modules, no build step and no network request — and this program is the
-// handoff: it copies app/ and screenshots/ next to this file into the
-// output directory and writes /output/dossier.json with the vendored
-// make.fun library, so the judge can read the entry.
-//
+// In the grader the output directory is /output. Locally, set
+// MAKEFUN_OUTPUT_DIR instead:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-//
-// Outside the grader MAKEFUN_OUTPUT_DIR stands in for /output; inside the
-// grader it is unset and /output is used. The program writes the same bytes
-// on every run: it copies files as they are and lets buildDossier do the
-// only summarising, so two runs are byte-identical.
 
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
 
 const repoRoot = fileURLToPath(new URL('.', import.meta.url));
-const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const appDir = join(repoRoot, 'app');
+const shotsDir = join(repoRoot, 'screenshots');
 
-// Fresh output directory, then the two trees the entry is made of.
-mkdirSync(outputDir, { recursive: true });
-cpSync(join(repoRoot, 'app'), join(outputDir, 'app'), { recursive: true });
+// Start from an empty output directory so a stale file can never leak
+// into a submission.
+rmSync(outDir, { recursive: true, force: true });
+mkdirSync(outDir, { recursive: true });
+cpSync(appDir, join(outDir, 'app'), { recursive: true });
+mkdirSync(join(outDir, 'screenshots'), { recursive: true });
+if (existsSync(shotsDir)) {
+  cpSync(shotsDir, join(outDir, 'screenshots'), { recursive: true });
+}
 
-const shotsDir = join(outputDir, 'screenshots');
-mkdirSync(shotsDir, { recursive: true });
-const repoShots = join(repoRoot, 'screenshots');
-if (existsSync(repoShots)) cpSync(repoShots, shotsDir, { recursive: true });
-
-// The scorer's own caps, from the kit's gate: the text budget shapes the
-// dossier's bytes; the rest refuse an entry the scorer would refuse — more
-// than 4 screenshots or one over 256 KiB, more than 993 files in app/ or
-// 48 MiB of app files in all, or an app/ path over 1000 bytes. app/ counts
-// beside /output's own 1000-entry cap, its screenshots/ and dossier.json.
-writeFileSync(
-  join(outputDir, 'dossier.json'),
-  buildDossier(outputDir, {
-    text_max_bytes: 163840,
-    screenshots: { max: 4, max_bytes: 262144 },
-    app_max_files: 993,
-    app_max_bytes: 50331648,
-    app_path_max_bytes: 1000,
-  }),
-);
+// The scorer's own caps: dossier text is capped at 160 KiB, screenshots
+// at 4 files of 256 KiB each, app/ at 993 entries and 48 MiB in total.
+const dossier = buildDossier(outDir, {
+  text_max_bytes: 163840,
+  screenshots: { max: 4, max_bytes: 262144 },
+  app_max_files: 993,
+  app_max_bytes: 50331648,
+  app_path_max_bytes: 1000,
+});
+writeFileSync(join(outDir, 'dossier.json'), dossier);
+console.log(`wrote ${join(outDir, 'dossier.json')} (${dossier.length} bytes)`);
